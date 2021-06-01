@@ -21,7 +21,7 @@
         <div class="reservation-title">
           <p>御予約のお申込み</p>
         </div>
-        <form action="">
+        <form action="" @submit.prevent="transitionCheckReservation()">
           <label for="date">御予約日</label>
           <input type="date" class="input-date" v-model="date" required/>
           <label for="time">御予約時間</label>
@@ -107,7 +107,14 @@ export default{
       this.$router.push({name:"Home"})
     },
     transitionCheckReservation(){
+      if(this.date === ""||
+         this.time === ""||
+         this.user_num === ""
+      ){
+        alert("未選択の項目があります")
+      }else{
       this.$router.push({name:'CheckReservation',params:{id:this.$route.params.id},query:{date:this.date,time:this.time,user_num:this.user_num}})
+      }
     }
   },
   created(){
@@ -129,7 +136,7 @@ export default{
 .header-flex{
   display: flex;
 }
-#logout{
+#Header{
   margin-top:25px;
 }
 .content-flex{
@@ -145,6 +152,7 @@ export default{
 .sendback-image{
   width:50px;
   cursor: pointer;
+  border-radius: 10px;
 }
 .flex-title p{
   font-size:50px;

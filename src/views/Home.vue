@@ -4,13 +4,13 @@
      <div class="flex-header">
       <Rese/>
       <form class="search-box">
-        <input type="search" name="area" list="area-list" placeholder="All area">
+        <input type="search" name="area" list="area-list" placeholder="All area" v-model="searchAreaData">
         <datalist id="area-list">
           <option value="東京都"></option>
           <option value="大阪府"></option>
           <option value="福岡県"></option>
         </datalist>
-         <input type="search" name="genre" list="genre-list" placeholder="All genre">
+         <input type="search" name="genre" list="genre-list" placeholder="All genre" v-model="searchGenreData">
         <datalist id="genre-list">
           <option value="寿司"></option>
           <option value="焼肉"></option>
@@ -19,11 +19,11 @@
           <option value="ラーメン"></option>
         </datalist>
         <div class="search-text">
-          <input type="search" name="text" placeholder="Search...">
+          <input type="search" name="text" placeholder="Search..Name" v-model="searchTextData">
         </div>
       </form>
      </div>
-     <RestaurantsCard/>
+     <RestaurantsCard :searchArea="searchAreaData" :searchGenre="searchGenreData" :searchText="searchTextData"></RestaurantsCard>
   </div>
 </template>
 
@@ -36,8 +36,14 @@ export default {
     RestaurantsCard,
     Rese,
     Logout
+  },
+  data(){
+    return{
+      searchAreaData:"",
+      searchGenreData:"",
+      searchTextData:""
+    }
   }
-  
 }
 </script>
 

@@ -2,11 +2,14 @@
   <div class="flex-card">
     <div class="restaurantsCard" v-for="(value,index) in isCheckedShow" :key="index">
       <img :src="value.image_url" alt="" class="restaurants-img">
-      <h1>{{value.name}}</h1>
-      <div class="flex-category">
-        <p>#{{value.area.area}}</p>
-        <p>#{{value.genre.genre}}</p>
-      </div>
+        <div class="flex">
+          <h1>{{value.name}}</h1>
+          <img src="../assets/Reserved.png" alt="" class="reserved-img" v-if="isCheckedReservation(index)" @click="transitionMyPage">
+        </div>
+        <div class="flex-category">
+          <p>#{{value.area.area}}</p>
+          <p>#{{value.genre.genre}}</p>
+        </div>
       <div class="flex-icon">
         <button class="detail" @click="transitionDetail(index)">店舗ページへ</button>
         <div class="heart-img-red" @click="deleteFavorite(index)" v-if="isCheckedFavorite(index)"></div>
@@ -19,6 +22,7 @@
 <script>
 import axios from "axios";
 export default{
+  props:["searchArea","searchGenre","searchText"],
   data(){
     return{
       restaurantsInfo:[],
@@ -29,16 +33,12 @@ export default{
     async getRestaurants(){
       const restaurantsinfo = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants" +"?users_id=" + this.user_id);
       this.restaurantsInfo = restaurantsinfo.data.data;
-      if(this.$route.name==="MyPage"){
-        this.sendRestaurantsInfomation()
-      }
-    },
+      },
     async putFavorite(index){
       const putFavorite = await axios.put("https://floating-shelf-94821.herokuapp.com/api/v1/users/"+ this.user_id + "/favorites",{
-        restaurant_id : this.restaurantsInfo[index].id
+        restaurant_id : this.isCheckedShow[index].id
       });
-      const isPutFavorite = this.restaurantsInfo[index].favorites.push(this.user_id);
-      console.log(this.restaurantsInfo[index].favorites);
+      const isPutFavorite = this.isCheckedShow[index].favorites.push(this.user_id);
       console.log(putFavorite);
       console.log(isPutFavorite);
     },
@@ -46,24 +46,31 @@ export default{
       const deleteFavorite = await axios.request({
       method: 'delete',
       url: ["https://floating-shelf-94821.herokuapp.com/api/v1/users/"+ this.user_id + "/favorites"],
-      data: { restaurant_id:  this.restaurantsInfo[index].id}
+      data: { restaurant_id:  this.isCheckedShow[index].id}
       });
       console.log(deleteFavorite);
-      const isDeleteFavorite = this.restaurantsInfo[index].favorites.splice(0,1);
+      const isDeleteFavorite = this.isCheckedShow[index].favorites.splice(0,1);
       console.log(isDeleteFavorite);
     },
     transitionDetail(index){
-      this.$router.push({name:"RestaurantDetail",params:{id:this.restaurantsInfo[index].id}});
+      this.$router.push({name:"RestaurantDetail",params:{id:this.isCheckedShow[index].id}});
     },
     isCheckedFavorite(index){
-      if(this.restaurantsInfo[index].favorites.length ===1){
+      if(this.isCheckedShow[index].favorites.length ===1){
         return true
       }else{
         return false
       }
     },
-    sendRestaurantsInfomation(){
-      this.$emit("getRestaurantsData",this.restaurantsInfo);
+    isCheckedReservation(index){
+      if(this.isCheckedShow[index].reservations.length !==0){
+        return true
+      }else{
+        return false
+      }
+    },
+    transitionMyPage(){
+        this.$router.push('/mypage');
     }
   },
   computed:{
@@ -72,10 +79,24 @@ export default{
          return this.restaurantsInfo.filter(function(value){
            return value.favorites.length === 1
          })
+       }else if(this.$route.name === 'Home'){
+         const restaurantsArray= [];
+         for(const i in this.restaurantsInfo){
+           const restaurant = this.restaurantsInfo[i];
+           if(restaurant.area.area.indexOf(this.searchArea)!==-1 
+           &&
+           restaurant.genre.genre.indexOf(this.searchGenre)!==-1 
+           &&
+           restaurant.name.indexOf(this.searchText)!==-1
+           ){
+             restaurantsArray.push(restaurant);
+            }
+         }
+         return restaurantsArray;
        }else{
          return this.restaurantsInfo
        }
-    }
+    },
   },
   created(){
     this.getRestaurants();
@@ -90,13 +111,15 @@ export default{
   width: 250px;
   box-shadow: 4px 4px 4px gray;
   background-color: aliceblue;
-  margin:5px;
+  margin:5px 5px 5px 40px;
 }
 .flex-card{
   width:100%;
   display: flex;
   flex-wrap:wrap;
-  justify-content: space-around;
+}
+.flex{
+  display: flex;
 }
 .restaurants-img{
   height: 50%;
@@ -109,6 +132,16 @@ export default{
   font-weight: bold;
   margin-top:10px;
   margin-left:10px;
+}
+.reserved-img{
+  margin-left:auto;
+  margin-right:30px;
+  margin-top:10px;
+  height: 25%;
+  width: 40%;
+  background-size: contain;
+  background-position: center;
+  cursor: pointer;
 }
 .flex-category,
 .flex-icon{

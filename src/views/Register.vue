@@ -12,7 +12,7 @@
         </div>
         <div class="inputform">
           <div class="icon2"></div>
-          <input class="input" type="email" placeholder="emailアドレス" name="email" pattern="^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$" v-model="email"/>
+          <input class="input" type="email" placeholder="emailアドレス sample@xxx.yyy" name="email" pattern="^[A-Za-z0-9]{1}[A-Za-z0-9_.-]*@{1}[A-Za-z0-9_.-]{1,}\.[A-Za-z0-9]{1,}$" v-model="email"/>
         </div>
         <div class="inputform">
           <div class="icon3"></div>

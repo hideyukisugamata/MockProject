@@ -6,7 +6,7 @@
       <Rese/>
       <Logout/>
     </div>
-    <h1 class="user-name">{{this.userInfomation.user_name}}さん</h1>
+    <h1 class="user-name">{{this.$store.state.user_name}}さん</h1>
     <div class="flex-contents">
       <div class="showReservation" v-if="isCheckedReservation">
         <div class="check-reservation">
@@ -20,7 +20,7 @@
                 <table class="cards-table">
                   <tr>
                     <th>Restaurant</th>
-                    <td>：{{value.restaurant.name}}</td>
+                    <td class="restaurant-name" @click="transitionRestaurant(index)">：<span>{{value.restaurant.name}}</span></td>
                   </tr>
                   <tr>
                     <th>日にち(Date)</th>
@@ -42,9 +42,14 @@
       <div class="no-reservation" v-else>
         <p>予約情報はありません。</p>
       </div>
-      <div class="check-favorites">
+      <div class="check-favorite" v-if="isCheckedFavoriteInfomation">
         <p>お気に入り店舗一覧</p>
-        <RestaurantCard @getRestaurantsData="getRestaurantsInfomation"></RestaurantCard>
+        <div class="restaurant-card">
+          <RestaurantCard></RestaurantCard>
+        </div>
+      </div>
+      <div class="no-favorite" v-else>
+        <p>お気に入り登録はありません</p>
       </div>
     </div>
   </div>
@@ -70,22 +75,18 @@ export default{
       isCheckedCancel:false,
       cancelReservation:[],
       showRestaurantCard : true,
-      restaurantsInfomation : [],
       isCheckedReservation : [],
-      favoriteRestaurants:[],
-      userInfomation:[]
+      isCheckedFavoriteInfomation:[],
     }
   },
   methods:{
     async getReservation(){
       const getReservation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/reservations");
-      console.log(getReservation);
       if(getReservation.data.data.length === 0){
         this.isCheckedReservation = false
       }else{
       this.isCheckedReservation = true
       this.reservationInfomation = getReservation.data.data;
-      console.log(this.reservationInfomation[0]);
       }
     },
     showModalWindow(value){
@@ -95,26 +96,21 @@ export default{
     closeModal(){
       this.isCheckedCancel = false;
     },
-    getRestaurantsInfomation(restaurantsInfo){
-      this.restaurantsInfomation = restaurantsInfo;
-      console.log(this.restaurantsInfomation);
+    async getFavoriteInfomation(){
+      const getFavoriteInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/favorites");
+      if(getFavoriteInfomation.data.data.length === 0){
+        this.isCheckedFavoriteInfomation = false
+      }else{
+        this.isCheckedFavoriteInfomation = true
+      }
     },
-    async getFavoriteRestaurants(){
-      const getFavoriteRestaurants = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/favorites");
-      this.favoriteRestaurants = getFavoriteRestaurants.data.data;
-      console.log(this.favoriteRestaurants);
-    },
-    async getUserInfomation(){
-      const getUserInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id);
-      this.userInfomation = getUserInfomation.data.data;
-      console.log(this.userInfomation);
+    transitionRestaurant(index){
+      this.$router.push({name:'RestaurantDetail',params:{id:this.reservationInfomation[index].restaurant_id}});
     }
   },
   created(){
-    this.getUserInfomation();
     this.getReservation();
-    this.getFavoriteRestaurants();
-
+    this.getFavoriteInfomation();
   },
 }
 </script>
@@ -131,7 +127,7 @@ export default{
 .flex{
   display: flex;
 }
-#logout{
+#Header{
   margin-top:25px;
 }
 .user-name{
@@ -199,7 +195,6 @@ export default{
 }
 .reservation-number{
   padding-left:20px;
-  text-decoration-line: underline;
   font-weight: bold;
   color: aliceblue;
   line-height: 40px;
@@ -210,10 +205,23 @@ export default{
 tr{
   border-bottom: 1px solid #5867EC;
 }
-.check-favorites{
-  width: 50%;
+.restaurant-name span{
+  cursor: pointer;
+  text-decoration-line: underline;
+  color: #5867EC; 
 }
-.check-favorites p{
+.restaurant-card{
+  width: 100%;
+  margin-top:15px;
+  margin-left:30px;
+}
+.check-favorite,
+.no-favorite{
+  width: 50%;
+  margin-left:10px;
+}
+.check-favorite p,
+.no-favorite p{
   font-size:20px;
   font-weight: bold;
   color: aliceblue;

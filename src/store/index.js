@@ -10,7 +10,8 @@ export default new Vuex.Store({
   plugins:[createPersistedState()],
   state: {
     auth: "",
-    user_id:"",
+    user_id: "",
+    user_name:""
   },
   mutations: {
     auth(state, payload) {
@@ -18,6 +19,9 @@ export default new Vuex.Store({
     },
     user_id(state, payload) {
       state.user_id = payload;
+    },
+    user_name(state, payload) {
+      state.user_name = payload;
     },
     logout(state, payload) {
       state.auth = payload;
@@ -39,6 +43,7 @@ export default new Vuex.Store({
         });
       commit("auth", responseLogin.data.auth);
       commit("user_id", responseLogin.data.data.id);
+      commit("user_name", responseLogin.data.data.user_name);
       router.replace("/");
     },
     logout({ commit }) {

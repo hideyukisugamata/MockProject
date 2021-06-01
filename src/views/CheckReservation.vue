@@ -12,7 +12,7 @@
          <table>
             <tr>
               <th>お名前</th>
-              <td>{{this.userInfomation.user_name}}様</td>
+              <td>{{this.$store.state.user_name}}様</td>
             <tr>
               <th>店舗名</th>
               <td>{{this.restaurantInfomation.name}}<span>({{this.restaurantInfomation.area.area}})</span></td>
@@ -32,7 +32,8 @@
           </table>
       </div>
       <div class="parent-button">
-        <button @click="postReservation">予約する</button>
+        <button @click="postReservation" class="post-button">予約する</button>
+        <button @click="backReservation" class="back-button">戻る</button>
       </div>
     </div>
   </div>
@@ -53,7 +54,6 @@ data(){
     user_id : this.$store.state.user_id,
     restaurant_id : this.$route.params.id,
     restaurantInfomation:[],
-    userInfomation:[],
     reserved_date : this.$route.query.date,
     reserved_time : this.$route.query.time,
     reserved_user_num : this.$route.query.user_num
@@ -64,10 +64,6 @@ methods:{
       const getRestaurantInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants/" + this.restaurant_id);
       this.restaurantInfomation = getRestaurantInfomation.data.data;
       console.log(getRestaurantInfomation.data.data);
-    },
-    async getUserInfomation(){
-      const getUserInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id);
-      this.userInfomation = getUserInfomation.data.data;
     },
     async postReservation(){
       axios.post("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/reservations",{
@@ -86,6 +82,9 @@ methods:{
         console.log(error);
         this.$router.push({name:'RestaurantDetail',params:{id:this.restaurant_id}})
       })
+    },
+    backReservation(){
+      this.$router.push({name:'RestaurantDetail',params:{id:this.restaurant_id}});
     }
 },
 created(){
@@ -100,7 +99,7 @@ created(){
 .flex{
   display: flex;
 }
-#logout{
+#Header{
   margin-right:150px;
   margin-top:20px;
 }
@@ -154,8 +153,10 @@ table span{
 .parent-button{
   width:100%;
   text-align: center;
+  display: flex;
+  justify-content: space-around;
 }
-button{
+.post-button{
   height:40px;
   width:100px;
   margin-top:15px;
@@ -163,6 +164,19 @@ button{
   border-radius:10px;
   background-color: #5867EC;
   color:#ffff;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow:0.5px 0.5px 0.5px black;
+  cursor: pointer;
+}
+.back-button{
+  height:40px;
+  width:100px;
+  margin-top:15px;
+  margin-bottom: 15px;
+  border-radius:10px;
+  background-color: #5867EC;
+  color:#0000;
   font-size: 18px;
   font-weight: bold;
   text-shadow:0.5px 0.5px 0.5px black;
