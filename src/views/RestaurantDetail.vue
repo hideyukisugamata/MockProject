@@ -8,7 +8,9 @@
       <div class ="restaurant-detail">
         <div class="flex-title">
           <img src="../assets/back.png" class="sendback-image" @click="transitionhome()">
-          <p>{{this.restaurantInfomation.name}}</p>
+          <p class="restaurant-name">{{this.restaurantInfomation.name}}</p>
+          <p class="restaurant-review" @click="transitionReview" v-if="isCheckedReview">このお店の口コミを編集する</p>
+          <p class="restaurant-review" @click="transitionReview" v-else>このお店の口コミを投稿</p>
         </div>
         <img :src="this.restaurantInfomation.image_url" class="restaurant-image">
         <div class="restaurantInfo-flex">
@@ -17,65 +19,7 @@
         </div>
         <p class="restaurant-comment">{{this.restaurantInfomation.comment}}</p>
       </div>
-      <div class="reservation">
-        <div class="reservation-title">
-          <p>御予約のお申込み</p>
-        </div>
-        <form action="" @submit.prevent="transitionCheckReservation()">
-          <label for="date">御予約日</label>
-          <input type="date" class="input-date" v-model="date" required/>
-          <label for="time">御予約時間</label>
-          <input type="search" class="input-time" list="time-list" v-model="time" placeholder="お選び下さい" required/>
-            <datalist id="time-list">
-              <option value=17:00></option>
-              <option value=17:30></option>
-              <option value=18:00></option>
-              <option value=18:30></option>
-              <option value=19:00></option>
-              <option value=19:30></option>
-              <option value=20:00></option>
-              <option value=20:30></option>
-              <option value=21:00></option>
-            </datalist>
-          <label for="number">御来店人数</label>
-          <input type="search" class="input-number" list="num-list" v-model="user_num" placeholder="お選び下さい" required/>
-          <datalist id="num-list">
-              <option value=1></option>
-              <option value=2></option>
-              <option value=3></option>
-              <option value=4></option>
-              <option value=5></option>
-              <option value=6></option>
-              <option value=7></option>
-              <option value=8></option>
-              <option value=9></option>
-              <option value=10></option>
-            </datalist>
-        </form>
-        <div class="reservation-infomation">
-          <table>
-            <tr>
-              <th>店舗名</th>
-              <td>{{this.restaurantInfomation.name}}</td>
-            </tr>
-            <tr>
-              <th>予約日(date)</th>
-              <td>{{this.date}}</td>
-            </tr>
-            <tr>
-              <th>お時間(time)</th>
-              <td>{{this.time}}</td>
-            </tr>
-            <tr>
-              <th>御来店人数(number)</th>
-              <td>{{this.user_num}}名様</td>
-            </tr>
-          </table>
-        </div>
-        <div class="parent-button">
-          <button @click="transitionCheckReservation">予約確認へ</button>
-        </div>
-      </div>
+      <Reservationform :restaurantInfomation="restaurantInfomation"/>
     </div>
   </div>
 </template>
@@ -83,38 +27,34 @@
 <script>
 import Rese from "../components/Rese";
 import Logout from "../components/Logout";
+import Reservationform from "../components/ReservationForm";
 import axios from "axios";
 export default{
   components:{
     Rese,
-    Logout
+    Logout,
+    Reservationform
   },
   data(){
     return{
-      restaurantInfomation:[],
-      date:"",
-      time:"",
-      user_num:""
+      restaurantInfomation:{name:"",area:"",genre:""},
+      reviewInfomation:{},
+      isCheckedReview : false
     }
   },
   methods:{
     async getRestaurant(){
-      const GetRestaurantInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants/" + this.$route.params.id);
+      const GetRestaurantInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants/" + this.$route.params.id + '?users_id=' + this.$store.state.user_id);
       this.restaurantInfomation = GetRestaurantInfomation.data.data;
-      console.log(this.restaurantInfomation);
+      if(this.restaurantInfomation.reviews.length >= 1){
+        this.isCheckedReview = true
+      }
     },
     transitionhome(){
       this.$router.push({name:"Home"})
     },
-    transitionCheckReservation(){
-      if(this.date === ""||
-         this.time === ""||
-         this.user_num === ""
-      ){
-        alert("未選択の項目があります")
-      }else{
-      this.$router.push({name:'CheckReservation',params:{id:this.$route.params.id},query:{date:this.date,time:this.time,user_num:this.user_num}})
-      }
+    transitionReview(){
+      this.$router.push({name:'Review',params:this.$route.params.id})
     }
   },
   created(){
@@ -154,12 +94,21 @@ export default{
   cursor: pointer;
   border-radius: 10px;
 }
-.flex-title p{
+.restaurant-name{
   font-size:50px;
   font-weight: bold;
   margin-left:30px;
-  width:100%;
   color: aliceblue;
+}
+.restaurant-review{
+  font-size:15px;
+  font-weight: bold;
+  color: #5867EC;
+  margin-top:30px;
+  margin-left:auto;
+  margin-right: 10px;
+  cursor: pointer;
+  text-decoration-line: underline;
 }
 .restaurant-image{
   width:100%;
@@ -182,97 +131,5 @@ export default{
   font-size:20px;
   color: aliceblue;
 }
-.reservation{
-  width:45%;
-  margin-right:10px;
-  margin-left:20px;
-  background-color: #0fb3ff;
-  border-radius: 10px;
-}
-.reservation-title{
-  height: 50px;
-  width: 100%;
-  margin-bottom:20px;
-  background-color: #5867EC;
-  text-align: center;
-  border-radius: 10px 10px 0px 0px;
-  text-shadow:0.5px 0.5px 0.5px black;
-}
-.reservation p{
-  font-size:20px;
-  font-weight: bold;
-  color:aliceblue;
-  line-height: 50px;
-  margin-left:10px;
-  text-shadow:0.5px 0.5px 0.5px black;
-}
-.reservation label{
-  display: block;
-  margin-left: 10px;
-  margin-top:15px;
-  margin-bottom:8px;
-  font-size: 15px;
-  font-weight: bold;
-}
-.reservation input{
-  display: block;
-  margin-left:10px;
-  border:none;
-  border-radius: 5px;
-  background-color: aliceblue;
-}
-.input-date{
-  width:30%;
-}
-.input-time,
-.input-number{
-  width:80%;
-}
-.reservation-infomation{
-  background-color: aliceblue;
-  color:#3f3f3f;
-  width: 80.5%;
-  margin-top:30px;
-  margin-left: 10px;
-  border-radius: 5px;
-}
-table {
-  width: 100%;
-}
-table tr{
-  border-bottom: 1px solid #5867EC;
-  height:37px;
-}
-table tr:last-child{
-  border-bottom: none;
-}
 
-table td {
-  font-weight: bold;
-  padding:10px;
-}
-table th {
-  font-weight: bold;
-  padding-left:10px;
-  text-align: left;
-  width:200px;
-  color:#5867EC;
-  line-height: 37px;
-}
-.parent-button{
-  width:100%;
-  text-align: center;
-}
-button{
-  height:40px;
-  width:100px;
-  margin-top:30px;
-  margin-bottom:30px;
-  border-radius:10px;
-  background-color: #5867EC;
-  color:#ffff;
-  font-weight: bold;
-  text-shadow:0.5px 0.5px 0.5px black;
-  cursor: pointer;
-}
 </style>

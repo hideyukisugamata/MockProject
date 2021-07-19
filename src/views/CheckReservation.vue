@@ -12,22 +12,22 @@
          <table>
             <tr>
               <th>お名前</th>
-              <td>{{this.$store.state.user_name}}様</td>
+              <td>{{$store.state.user_name}}様</td>
             <tr>
               <th>店舗名</th>
-              <td>{{this.restaurantInfomation.name}}<span>({{this.restaurantInfomation.area.area}})</span></td>
+              <td>{{restaurant_name}}<span>({{restaurant_area}})</span></td>
             </tr>
             <tr>
               <th>予約日(date)</th>
-              <td>{{this.reserved_date}}</td>
+              <td>{{reserved_date}}</td>
             </tr>
             <tr>
               <th>お時間(time)</th>
-              <td>{{this.reserved_time}}</td>
+              <td>{{reserved_time}}</td>
             </tr>
             <tr>
               <th>御来店人数(number)</th>
-              <td>{{this.reserved_user_num}}名様</td>
+              <td>{{reserved_user_num}}名様</td>
             </tr>
           </table>
       </div>
@@ -53,18 +53,14 @@ data(){
   return{
     user_id : this.$store.state.user_id,
     restaurant_id : this.$route.params.id,
-    restaurantInfomation:[],
     reserved_date : this.$route.query.date,
     reserved_time : this.$route.query.time,
-    reserved_user_num : this.$route.query.user_num
+    reserved_user_num : this.$route.query.user_num,
+    restaurant_name : this.$route.query.name,
+    restaurant_area : this.$route.query.area
   }
 },
 methods:{
-    async getRestaurantInfomation(){
-      const getRestaurantInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants/" + this.restaurant_id);
-      this.restaurantInfomation = getRestaurantInfomation.data.data;
-      console.log(getRestaurantInfomation.data.data);
-    },
     async postReservation(){
       axios.post("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/reservations",{
         user_id : this.user_id,
@@ -87,10 +83,6 @@ methods:{
       this.$router.push({name:'RestaurantDetail',params:{id:this.restaurant_id}});
     }
 },
-created(){
-  this.getRestaurantInfomation(),
-  this.getUserInfomation()
-}
 }
 
 </script>

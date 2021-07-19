@@ -33,7 +33,7 @@ export default{
     async getRestaurants(){
       const restaurantsinfo = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/restaurants" +"?users_id=" + this.user_id);
       this.restaurantsInfo = restaurantsinfo.data.data;
-      },
+    },
     async putFavorite(index){
       const putFavorite = await axios.put("https://floating-shelf-94821.herokuapp.com/api/v1/users/"+ this.user_id + "/favorites",{
         restaurant_id : this.isCheckedShow[index].id

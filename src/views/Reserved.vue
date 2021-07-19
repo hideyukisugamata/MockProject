@@ -45,7 +45,7 @@ export default{
 .flex{
   display: flex;
 }
-#logout{
+#Header{
   margin-right:150px;
   margin-top:20px;
 }

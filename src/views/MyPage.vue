@@ -1,55 +1,58 @@
 <template>
-  <div id="mypage">
-    <CancelReservation :cancelData="cancelReservation" v-show="isCheckedCancel" @closeModal="closeModal()"/>
-
-    <div class="flex">
-      <Rese/>
-      <Logout/>
-    </div>
-    <h1 class="user-name">{{this.$store.state.user_name}}さん</h1>
-    <div class="flex-contents">
-      <div class="showReservation" v-if="isCheckedReservation">
-        <div class="check-reservation">
-          <p class="check-reservation-title">予約状況（全{{this.reservationInfomation.length}}件)</p>
-            <div class="check-reservation-cards-div">
-              <div class="check-reservation-cards" v-for="(value,index) in reservationInfomation" :key="index">
-                <div class="cards-number">
-                  <p class="reservation-number">予約{{index + 1}}</p>
-                  <p class="cancel-reservation" @click="showModalWindow(value)">この予約をキャンセル</p>
+  <div>
+    <div id="mypage">
+      <CancelReservation :cancelData="cancelReservation" v-show="isCheckedCancel" @closeModal="closeModal()"/>
+      <UpdateReservation v-show="isCheckedUpdate" :updateInfomation="updateInfomation" @closeUpdateModalToParent="closeUpdateModal()"/>
+      <div class="flex">
+        <Rese/>
+        <Logout/>
+      </div>
+      <h1 class="user-name">{{this.$store.state.user_name}}さん</h1>
+      <div class="flex-contents">
+        <div class="showReservation" v-if="isCheckedReservation">
+          <div class="check-reservation">
+            <p class="check-reservation-title">予約状況（全{{this.reservationInfomation.length}}件)</p>
+              <div class="check-reservation-cards-div">
+                <div class="check-reservation-cards" v-for="(value,index) in reservationInfomation" :key="index">
+                  <div class="cards-number">
+                    <p class="reservation-number">予約{{index + 1}}</p>
+                    <p class="update-reservation" @click="updateReservation(value)">この予約を変更する</p>
+                    <p class="cancel-reservation" @click="showModalWindow(value)">この予約をキャンセル</p>
+                  </div>
+                  <table class="cards-table">
+                    <tr>
+                      <th>Restaurant</th>
+                      <td class="restaurant-name" @click="transitionRestaurant(index)">：<span>{{value.restaurant.name}}</span></td>
+                    </tr>
+                    <tr>
+                      <th>日にち(Date)</th>
+                      <td>：{{value.date}}</td>
+                    </tr>
+                    <tr>
+                      <th>時間(Time)</th>
+                      <td>：{{value.time}}</td>
+                    </tr>
+                    <tr>
+                      <th>人数(Number)</th>
+                      <td>：{{value.num_users}}</td>
+                    </tr>
+                  </table>
                 </div>
-                <table class="cards-table">
-                  <tr>
-                    <th>Restaurant</th>
-                    <td class="restaurant-name" @click="transitionRestaurant(index)">：<span>{{value.restaurant.name}}</span></td>
-                  </tr>
-                  <tr>
-                    <th>日にち(Date)</th>
-                    <td>：{{value.date}}</td>
-                  </tr>
-                  <tr>
-                    <th>時間(Time)</th>
-                    <td>：{{value.time}}</td>
-                  </tr>
-                  <tr>
-                    <th>人数(Number)</th>
-                    <td>：{{value.num_users}}</td>
-                  </tr>
-                </table>
-              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="no-reservation" v-else>
-        <p>予約情報はありません。</p>
-      </div>
-      <div class="check-favorite" v-if="isCheckedFavoriteInfomation">
-        <p>お気に入り店舗一覧</p>
-        <div class="restaurant-card">
-          <RestaurantCard></RestaurantCard>
+        <div class="no-reservation" v-else>
+          <p>予約情報はありません。</p>
         </div>
-      </div>
-      <div class="no-favorite" v-else>
-        <p>お気に入り登録はありません</p>
+        <div class="check-favorite" v-if="isCheckedFavoriteInfomation">
+          <p>お気に入り店舗一覧</p>
+          <div class="restaurant-card">
+            <RestaurantCard></RestaurantCard>
+          </div>
+        </div>
+        <div class="no-favorite" v-else>
+          <p>お気に入り登録はありません</p>
+        </div>
       </div>
     </div>
   </div>
@@ -60,23 +63,31 @@ import Rese from "../components/Rese"
 import Logout from "../components/Logout"
 import CancelReservation from "../components/CancelReservation"
 import RestaurantCard from "../components/RestaurantsCard"
+import UpdateReservation from "../components/UpdateReservation"
 import axios from "axios"
 export default{
   components:{
     Rese,
     Logout,
     CancelReservation,
-    RestaurantCard
+    RestaurantCard,
+    UpdateReservation
   },
   data(){
     return{
       user_id : this.$store.state.user_id,
-      reservationInfomation:[],
+      reservationInfomation:[
+        {restaurant:{
+          name:""
+        }}
+      ],
       isCheckedCancel:false,
       cancelReservation:[],
       showRestaurantCard : true,
       isCheckedReservation : [],
       isCheckedFavoriteInfomation:[],
+      isCheckedUpdate: false,
+      updateInfomation:[],
     }
   },
   methods:{
@@ -87,7 +98,12 @@ export default{
       }else{
       this.isCheckedReservation = true
       this.reservationInfomation = getReservation.data.data;
+      console.log(this.reservationInfomation);
       }
+    },
+    updateReservation(value){
+      this.isCheckedUpdate = true;
+      this.updateInfomation = value;
     },
     showModalWindow(value){
       this.isCheckedCancel = true;
@@ -95,6 +111,9 @@ export default{
     },
     closeModal(){
       this.isCheckedCancel = false;
+    },
+    closeUpdateModal(){
+      this.isCheckedUpdate = false;
     },
     async getFavoriteInfomation(){
       const getFavoriteInfomation = await axios.get("https://floating-shelf-94821.herokuapp.com/api/v1/users/" + this.user_id + "/favorites");
@@ -188,6 +207,14 @@ export default{
   line-height: 40px;
   text-decoration-line: underline;
   cursor: pointer;
+}
+.update-reservation{
+  color: aliceblue;
+  font-size: 12px;
+  line-height: 40px;
+  text-decoration-line: underline;
+  cursor: pointer;
+  margin-left: 100px;
 }
 .cards-table{
   margin-left:10px;

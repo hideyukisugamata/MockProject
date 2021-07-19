@@ -11,10 +11,13 @@ import LogoutThanks from "../views/LogoutThanks.vue"
 import RestaurantDetail from "../views/RestaurantDetail.vue"
 import CheckReservation from "../views/CheckReservation.vue"
 import Mypage from "../views/MyPage.vue"
+import StarRating from 'vue-star-rating'
+import Review from '../views/Review.vue'
 
 
 Vue.use(VueRouter);
 Vue.use(ToggleButton);
+Vue.use(StarRating);
 
 const routes = [
   {
@@ -75,6 +78,14 @@ const routes = [
     path: '/mypage',
     name: 'MyPage',
     component: Mypage,
+    meta: {
+      requiresAuth:true,
+    }
+  },
+  {
+    path: '/review/:id',
+    name: 'Review',
+    component: Review,
     meta: {
       requiresAuth:true,
     }

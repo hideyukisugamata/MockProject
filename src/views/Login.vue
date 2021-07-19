@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <Rese/>
+    <div class=header-div>
+      <Rese/>
+      <p class="transition-register" @click="transitionRegister">新規会員登録はコチラ</p>
+    </div>
     <div class="login-card">
       <div class="title">
         <p>ログイン(Login)</p>
@@ -46,12 +49,30 @@ export default{
         email:this.email,
         password:this.password
       });
+    },
+    transitionRegister(){
+      this.$router.push('Register');
     }
   }
 };
 </script>
 
 <style scoped>
+.header-div{
+  display: flex;
+  height: 80px;
+  align-items: center;
+}
+.transition-register{
+  color:aliceblue;
+  font-size:14px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 200px;
+  margin-left: auto;
+  margin-right: 100px;
+  text-decoration-line: underline;
+}
 .login-card{
   height:300px;
   width:485.4px;

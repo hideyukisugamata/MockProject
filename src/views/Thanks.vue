@@ -12,12 +12,12 @@
 import Rese from "../components/Rese";
 export default{
   components:{
-    Rese
+    Rese,
   },
   methods:{
     transitionLogin(){
       this.$router.replace('/login');
-    }
+    },
   }
 };
 </script>

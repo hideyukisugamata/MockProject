@@ -3,7 +3,7 @@
     <div class="modalWindow-back">
         <div class="modalWindow-canceled" v-if="isChecked">
           <h1>予約をキャンセルしました</h1>
-          <p @click="transitionMyPege">マイページへ戻る</p>
+          <p @click="transitionMyPage">マイページへ戻る</p>
         </div>
         <div class="modalWindow-check" v-else>
           <p>こちらの予約をキャンセルしますか？</p>
@@ -61,7 +61,7 @@ export default{
         this.$router.push('MyPage');
       })
     },
-    transitionMyPege(){
+    transitionMyPage(){
       this.$router.go({
         path: this.$router.currentRoute.path,
         force: true,
@@ -78,7 +78,7 @@ export default{
   width: 100%;
   height: 100vh;
   background-color: rgba(0,0,0,0.3);
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   align-items: center;
